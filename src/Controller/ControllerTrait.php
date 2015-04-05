@@ -3,7 +3,6 @@
 namespace j4k\Api\Controller;
 
 use j4k\Api\Http\ResponseFactory;
-use j4k\Api\Transformer\TransformerFactory;
 
 trait ControllerTrait
 {

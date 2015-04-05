@@ -29,11 +29,9 @@ class FractalTransformer
        $this->eager = $eager;
     }
 
-    public function transform($response, $transformer, Binding $binding, Request $request)
+    public function transform($response, $transformer, Request $request, $params = [])
     {
-        $this->getIncludes($request);
-
-        $resource = $this->createResource($response, $transformer, $binding->getParameters());
+        $resource = $this->createResource($response, $transformer, $params);
 
         if ($response instanceof IlluminatePaginator) {
             $paginator = $this->createPaginatorAdapter($response);
@@ -45,13 +43,13 @@ class FractalTransformer
             $response->load($eagerLoads);
         }
 
-        foreach ($binding->getMeta() as $key => $val) {
-            $resource->setMetaValue($key, $val);
-        }
-
-        $binding->fireCallback($resource);
-
         return $this->fractal->createData($resource)->toArray();
+    }
+
+    protected function createPaginatorAdapter($response)
+    {
+        // TODO : Create
+        // get the paginator and create a new IlluminatePaginatorAdapter
     }
 
     protected function createResource($response, $transformer, array $parameters)
