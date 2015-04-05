@@ -14,7 +14,7 @@ class ResponseFactory
 
     protected $transformer;
 
-    public function __construct(TransformerFactor $transformer)
+    public function __construct(TransformerFactory $transformer)
     {
         $this->transformer = $transformer;
     }
@@ -53,7 +53,7 @@ class ResponseFactory
 
     public function created($location = null)
     {
-        $response = new ResponseBuilder(null);
+        $response = new ResponseBuilder(null, null);
         $response->setStatusCode(201);
 
         if(! is_null($location))

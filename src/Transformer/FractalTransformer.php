@@ -25,7 +25,7 @@ class FractalTransformer
     {
        $this->fractal = $fractal;
        $this->includeKey = $includeKey;
-       $this->includeSeperator = $includeSeperatpr;
+       $this->includeSeperator = $includeSeperator;
        $this->eager = $eager;
     }
 
@@ -40,7 +40,7 @@ class FractalTransformer
             $resource->setPaginator($paginator);
         }
 
-        if ($response instanceof EloquentCollection && this->eager) {
+        if ($response instanceof EloquentCollection && $this->eager) {
             $eagerLoads = $this->mergeEagerLoads($transformer, $this->fractal->getRequestedIncludes());
             $response->load($eagerLoads);
         }
@@ -84,7 +84,7 @@ class FractalTransformer
         $eagerLoads = [];
 
         foreach ($includes as $key => $val) {
-            $eagerLoads[] = is_string($key) ? $key : $value;
+            $eagerLoads[] = is_string($key) ? $key : $val;
         }
 
         return $eagerLoads;
