@@ -18,12 +18,6 @@ class TransformerFactory
     protected $container;
 
     /**
-     * Transformer Bindings
-     * @var Array
-     */
-    protected $bindings;
-
-    /**
      * Transformation Class
      */
     protected $transformer;
@@ -31,14 +25,15 @@ class TransformerFactory
     /**
      * Construct
      */
-    public function __construct(Container $container, TransformerInterface $transformer)
+    public function __construct(Container $container, TransformerContract $transformer)
     {
         $this->container = $container;
         $this->transformer = $transformer;
     }
 
-    /**
-     * Register a transformer
-     */
+    public function transform($response, $transformer, array $parameters = [], Closure $after = null)
+    {
+        return $this->transformer->transform($response, $transformer, $parameters, $after);
+    }
 
 }

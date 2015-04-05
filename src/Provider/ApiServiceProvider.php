@@ -5,6 +5,7 @@ namespace j4k\Api\Provider;
 use Illuminate\Support\ServiceProvider;
 use j4k\Api\Http\ResponseFactory;
 use j4k\Api\Transformer\TransformerFactory;
+use j4k\Api\Controller\ControllerDispatcher;
 
 class ApiServiceProvider extends ServiceProvider
 {
@@ -21,8 +22,17 @@ class ApiServiceProvider extends ServiceProvider
 
     public function register()
     {
+        $this->overloadControllerDispatcher();
         $this->registerTransformer();
         $this->registerResponseFactory();
+    }
+
+    protected function overloadControllerDispatcher()
+    {
+        $this->app->singleton('illuminate.route.dispatcher', function($app)
+        {
+            return new ControllerDispatcher($app['router'], $app);
+        });
     }
 
     /**
@@ -31,8 +41,7 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerTransformer()
     {
-        $this->app->bindShared('api.transformer', function ($app) {
-            // TODO : make config obj
+        $this->app->singleton('api.transformer', function ($app) {
             $transformer = $this->app->make('j4k\Api\Transformer\FractalTransformer');
             return new TransformerFactory($app, $transformer);
         });
@@ -44,10 +53,9 @@ class ApiServiceProvider extends ServiceProvider
      */
     protected function registerResponseFactory()
     {
-        $this->app->bindShared('api.response', function ($app) {
+        $this->app->singleton('api.response', function ($app) {
             return new ResponseFactory($app['api.transformer']);
         });
     }
-
 
 }

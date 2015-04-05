@@ -2,16 +2,15 @@
 
 namespace j4k\Api\Transformer;
 
-use Illuminate\Http\Request;
 use League\Fractal\Manager as Fractal;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Illuminate\Support\Collection as IlluminateCollection;
-use Illuminate\Pagination\Paginator as IlluminatePaginator;
 use League\Fractal\Resource\Collection as FractalCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator as IlluminatePaginator;
 
-class FractalTransformer
+class FractalTransformer implements TransformerContract
 {
     protected $fractal;
 
@@ -29,7 +28,7 @@ class FractalTransformer
        $this->eager = $eager;
     }
 
-    public function transform($response, $transformer, Request $request, $params = [])
+    public function transform($response, $transformer, $params = [], Closure $after = null)
     {
         $resource = $this->createResource($response, $transformer, $params);
 
@@ -46,10 +45,9 @@ class FractalTransformer
         return $this->fractal->createData($resource)->toArray();
     }
 
-    protected function createPaginatorAdapter($response)
+    protected function createPaginatorAdapter(IlluminatePaginator $paginator)
     {
-        // TODO : Create
-        // get the paginator and create a new IlluminatePaginatorAdapter
+        return new IlluminatePaginatorAdapter($paginator);
     }
 
     protected function createResource($response, $transformer, array $parameters)
@@ -61,16 +59,6 @@ class FractalTransformer
         }
 
         return new FractalItem($response, $transformer, $key);
-    }
-
-    public function parseFractalIncludes(Request $request)
-    {
-        $includes = $request->get($this->includeKey);
-
-        if(!is_array($includes))
-            $includes = array_filter(explode($this->includeSeperator, $includes));
-
-        $this->fractal->parseIncludes($includes);
     }
 
     protected function mergeEagerLoads($transformer, $requestedIncludes)

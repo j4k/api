@@ -2,26 +2,30 @@
 
 namespace j4k\Api\Http;
 
-use Response;
 use Symfony\Component\HttpFoundation\Cookie;
+use Illuminate\Http\Response;
 
 class ResponseBuilder
 {
 
-    protected $response;
+    protected $meta = [];
 
-    protected $transformerBind;
+    protected $response;
 
     protected $headers = [];
 
     protected $cookies = [];
 
-    protected $statusCodes = 200;
+    protected $statusCode = 200;
 
-    public function __construct($response, $transformerBind)
+    public function __construct($response)
     {
         $this->response = $response;
-        $this->transformerBind = $transformerBind;
+    }
+
+    public function addMeta($key, $val){
+        $this->meta[$key] = $val;
+        return $this;
     }
 
     public function meta($key, $val)
@@ -59,6 +63,8 @@ class ResponseBuilder
 
     public function build()
     {
+        $this->appendMeta();
+
         $response = new Response($this->response, $this->statusCode, $this->headers);
 
         foreach ($this->cookies as $cookie) {
@@ -68,4 +74,12 @@ class ResponseBuilder
 
         return $response;
     }
+    public function appendMeta()
+    {
+        foreach($this->meta as $key => $val){
+            $this->response['meta'][$key] = $val;
+        }
+    }
+
 }
+

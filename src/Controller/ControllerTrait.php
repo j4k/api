@@ -2,18 +2,13 @@
 
 namespace j4k\Api\Controller;
 
+use App;
 use j4k\Api\Http\ResponseFactory;
 
 trait ControllerTrait
 {
-    protected $auth;
 
     protected $response;
-
-    public function __construct()
-    {
-        parent::__construct();
-    }
 
     public function setResponseFactory(ResponseFactory $response)
     {

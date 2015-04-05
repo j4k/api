@@ -4,13 +4,14 @@ namespace j4k\Api\Http;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Illuminate\Pagination\Paginator;
 use j4k\Api\Transformer\TransformerFactory;
 
 class ResponseFactory
 {
+    protected $meta = [];
 
     protected $transformer;
 
@@ -21,39 +22,25 @@ class ResponseFactory
 
     public function collection(Collection $collection, $transformer, array $parameters = [], Closure $after = null)
     {
-        if ($collection->isEmpty()) {
-            $class = get_class($collection);
-        } else {
-            $class = get_class($collection->first());
-        }
-
-        $binding = $this->transformer->register($class, $transformer, $parameters, $after);
-
-        return new ResponseBuilder($collection, $binding);
+        $collection = $this->transformer->transform($collection, $transformer, $parameters, $after);
+        return new ResponseBuilder($collection);
     }
 
     public function item($item, $transformer, array $parameters = [], Closure $after = null)
     {
-        $class = get_class($item);
-        $binding = $this->transformer->register($class, $transformer, $parameters, $after);
-        return new ResponseBuilder($item, $binding);
+        $item = $this->transformer->transform($item, $transformer, $parameters, $after);
+        return new ResponseBuilder($item);
     }
 
-    public function paginator(Paginator $paginator, $transformer, array $parameters = [], Closure $after = null)
+    public function paginator(LengthAwarePaginator $paginator, $transformer, array $parameters = [], Closure $after = null)
     {
-        if ($paginator->isEmpty()) {
-            $class = get_class($paginator);
-        } else {
-            $class = get_class($paginator->first());
-        }
-
-        $binding = $this->transformer->register($class, $transformer, $parameters, $after);
-        return new ResponseBuilder($paginator, $binding);
+        $paginator = $this->transformer->transform($paginator, $transformer, $parameters, $after);
+        return new ResponseBuilder($paginator);
     }
 
     public function created($location = null)
     {
-        $response = new ResponseBuilder(null, null);
+        $response = new ResponseBuilder(null);
         $response->setStatusCode(201);
 
         if(! is_null($location))
@@ -69,7 +56,9 @@ class ResponseFactory
 
         $error = array_merge(['status_code', $statusCode], $error);
 
-        return $this->array($error)->setStatusCode($statusCode);
+        $response = new ResponseBuilder($error);
+        $response->setStatusCode($statusCode);
+        return $response;
     }
 
     public function notFound($message = 'The resource could not be found.')
