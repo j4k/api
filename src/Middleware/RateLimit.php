@@ -69,63 +69,41 @@ class RateLimit
         }
     }
 
-    protected function key($str)
+    protected function key($key)
     {
-        return $this->cacheKey;
+        return sprintf('api.%s.%s.%s', $this->keyPrefix, $key, $this->getRateLimiter());
     }
 
-    /**
-     * Determine if the request was rate limited.
-     *
-     * @return bool
-     */
+    public function getRateLimiter()
+    {
+        return call_user_func($this->limiter, $this->container, $this->request);
+    }
+
+    public function setRateLimiter(callable $limiter)
+    {
+        $this->limiter = $limiter;
+    }
+
     public function requestWasRateLimited()
     {
         return ! is_null($this->throttle);
     }
 
-    /**
-     * Cache a value under a given key for a certain amount of minutes.
-     *
-     * @param string $key
-     * @param mixed  $value
-     * @param int    $minutes
-     *
-     * @return void
-     */
     protected function cache($key, $value, $minutes)
     {
         $this->cache->add($this->key($key), $value, $minutes);
     }
-    /**
-     * Retrieve a value from the cache store.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
+
     protected function retrieve($key)
     {
         return $this->cache->get($this->key($key));
     }
-    /**
-     * Increment a key in the cache.
-     *
-     * @param string $key
-     *
-     * @return void
-     */
+
     protected function increment($key)
     {
         $this->cache->increment($this->key($key));
     }
-    /**
-     * Forget a key in the cache.
-     *
-     * @param string $key
-     *
-     * @return void
-     */
+
     protected function forget($key)
     {
         $this->cache->forget($this->key($key));
