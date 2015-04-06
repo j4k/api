@@ -74,7 +74,7 @@ class ResponseBuilder
 
         return $response;
     }
-    public function appendMeta()
+    protected function appendMeta()
     {
         foreach($this->meta as $key => $val){
             $this->response['meta'][$key] = $val;
