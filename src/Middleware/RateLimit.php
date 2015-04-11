@@ -23,39 +23,58 @@ class RateLimit
 
     protected $cacheKey;
 
+    protected $limiter;
+
+    protected $request;
+
     public function __construct(Container $container, CacheManager $cache )
     {
         $this->cache = $cache;
         $this->container = $container;
     }
-
     /**
      * Handle a request
      *
      * @param string $phrase Phrase to return
-     *
      * @return string Returns the phrase passed in
      */
     public function handle($request, Closure $next)
     {
+        $this->request = $request;
+
         // depending on the route configuration
-        // todo : allow controllers their own ratelimiting for all methods on the controller
         if( null !== $request->route()->getAction()['throttle']){
             $this->config = array_merge($this->config, $request->route()->getAction()['throttle']);
         }
+
         // if there is a limit - create a new throttle to be used against the key
-        if( $this->limit > 0  || $this->expires > 0){
+        if($this->limit > 0  || $this->expires > 0){
             $this->throttle = new Throttle(['limit' => $this->limit, 'expires' => $this->expires]);
             $this->cacheKey = md5($request->path());
+
+            $requestCount = $this->retrieve('requests');
+            $expires = $this->retrieve('reset');
+
+            if($expires < time()){
+                $requestCount = 0;
+            }
+
+            if($requestCount > $this->limit){
+                echo 'There were too many requests from this URL in our specified time period.';
+                exit;
+            }
         }
+
         // if this isn't a throttled route then return the next closure
-        if (is_null($this->throttle)) return $next( $request );
+        if ($this->requestWasNotRateLimited()) return $next( $request );
 
         $this->prepareCache();
+
         // cache the current requests
-        $this->cache('requests', 0, $this->throttle->getExpires());
+        $this->cache('requests', $requestCount, $this->throttle->getExpires());
         $this->cache('expires', $this->throttle->getExpires(), $this->throttle->getExpires());
         $this->cache('reset', time() + ($this->throttle->getExpires() * 60), $this->throttle->getExpires());
+
         $this->increment('requests');
 
         return $next( $request );
@@ -72,13 +91,15 @@ class RateLimit
 
     protected function key($key)
     {
-        // todo -> getRateLimiter needs to call a closure / callable
         return sprintf('api.%s.%s.%s', $this->cacheKey, $key, $this->getRateLimiter());
     }
 
     public function getRateLimiter()
     {
-        // returns callable of $this->limiter which should return a string for the cache key
+        $this->limiter = function(){
+            return $this->request->getClientIp();
+        };
+         // returns callable of $this->limiter which should return a string for the cache key
         return call_user_func($this->limiter, $this->container, $this->request);
     }
 
@@ -87,14 +108,14 @@ class RateLimit
         $this->limiter = $limiter;
     }
 
-    public function requestWasRateLimited()
+    public function requestWasNotRateLimited()
     {
-        return ! is_null($this->throttle);
+        return is_null($this->throttle);
     }
 
     protected function cache($key, $value, $minutes)
     {
-        $this->cache->add($this->key($key), $value, $minutes);
+        $this->cache->put($this->key($key), $value, $minutes);
     }
 
     protected function retrieve($key)
