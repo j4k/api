@@ -9,6 +9,7 @@ use Illuminate\Support\Collection as IlluminateCollection;
 use League\Fractal\Resource\Collection as FractalCollection;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator as IlluminatePaginator;
+use League\Fractal\Serializer\JsonApiSerializer as FractalJsonApiSerializer;
 
 class FractalTransformer implements TransformerContract
 {
@@ -23,9 +24,11 @@ class FractalTransformer implements TransformerContract
     public function __construct(Fractal $fractal, $includeKey = 'include', $includeSeperator = ',', $eager = true)
     {
        $this->fractal = $fractal;
+       $this->fractal->setSerializer(new FractalJsonApiSerializer());
        $this->includeKey = $includeKey;
        $this->includeSeperator = $includeSeperator;
        $this->eager = $eager;
+
     }
 
     public function transform($response, $transformer, $params = [], Closure $after = null)

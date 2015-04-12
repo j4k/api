@@ -5,7 +5,6 @@ namespace j4k\Api\Middleware;
 use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Support\Collection;
 use j4k\Api\Middleware\RateLimit\Throttle;
 
 class RateLimit
@@ -27,7 +26,7 @@ class RateLimit
 
     protected $request;
 
-    public function __construct(Container $container, CacheManager $cache )
+    public function __construct(Container $container, CacheManager $cache)
     {
         $this->cache = $cache;
         $this->container = $container;
@@ -41,17 +40,15 @@ class RateLimit
     public function handle($request, Closure $next)
     {
         $this->request = $request;
-
         // depending on the route configuration
-        if( null !== $request->route()->getAction()['throttle']){
+        $routeparams = $request->route()->getAction();
+        if( isset($routeparams['throttle']) && null !== $routeparams['throttle']){
             $this->config = array_merge($this->config, $request->route()->getAction()['throttle']);
         }
-
         // if there is a limit - create a new throttle to be used against the key
         if($this->limit > 0  || $this->expires > 0){
             $this->throttle = new Throttle(['limit' => $this->limit, 'expires' => $this->expires]);
             $this->cacheKey = md5($request->path());
-
             $requestCount = $this->retrieve('requests');
             $expires = $this->retrieve('reset');
 
@@ -60,6 +57,7 @@ class RateLimit
             }
 
             if($requestCount > $this->limit){
+                // TODO return 429 status code
                 echo 'There were too many requests from this URL in our specified time period.';
                 exit;
             }
@@ -96,16 +94,7 @@ class RateLimit
 
     public function getRateLimiter()
     {
-        $this->limiter = function(){
-            return $this->request->getClientIp();
-        };
-         // returns callable of $this->limiter which should return a string for the cache key
-        return call_user_func($this->limiter, $this->container, $this->request);
-    }
-
-    public function setRateLimiter(callable $limiter)
-    {
-        $this->limiter = $limiter;
+        return $this->request->getClientIp().$this->request->headers->get('user-agent');
     }
 
     public function requestWasNotRateLimited()
