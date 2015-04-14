@@ -1,6 +1,6 @@
 {
     "name": "j4k/api",
-    "description": ":package_description",
+    "description": "API Response / Serializer Package for Laravel",
     "keywords": [
         "j4k",
         "api"

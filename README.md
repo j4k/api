@@ -42,7 +42,7 @@ If you discover any security related issues, please email jw@jack.gd instead of 
 
 ## Credits
 
-- [j4k](https://github.com/:author_username)
+- [j4k](https://github.com/j4k)
 - [All Contributors](../../contributors)
 
 ## License
