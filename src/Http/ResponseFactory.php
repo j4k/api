@@ -92,8 +92,7 @@ class ResponseFactory
         if(! is_array($error))
             $error = ['message' => $error];
 
-        $error = array_merge(['status_code', $statusCode], $error);
-
+        $error = array_merge(['status_code' => $statusCode], $error);
         $response = new ResponseBuilder($error);
         $response->setStatusCode($statusCode);
         return $response;

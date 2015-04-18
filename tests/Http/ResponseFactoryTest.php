@@ -60,6 +60,15 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->withPaginator($paginator, $this->transformer);
     }
 
+    public function testCreatingErrorResponse()
+    {
+        $errorResponse = $this->factory->error('testError', 500)->build();
+        $this->assertEquals(500, $errorResponse->getStatusCode());
+        $this->assertNotEquals(200, $errorResponse->getStatusCode());
+
+        $this->assertEquals('{"status_code":500,"message":"testError"}', $errorResponse->getContent());
+    }
+
 
 
 }
