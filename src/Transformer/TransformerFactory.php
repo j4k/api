@@ -31,6 +31,13 @@ class TransformerFactory
         $this->transformer = $transformer;
     }
 
+    /**
+     * @param $response
+     * @param $transformer
+     * @param array $parameters
+     * @param callable $after
+     * @return mixed
+     */
     public function transform($response, $transformer, array $parameters = [], Closure $after = null)
     {
         return $this->transformer->transform($response, $transformer, $parameters, $after);

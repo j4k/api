@@ -2,6 +2,7 @@
 
 namespace j4k\Api\Transformer;
 
+use Closure;
 use League\Fractal\Manager as Fractal;
 use League\Fractal\Resource\Item as FractalItem;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -13,14 +14,32 @@ use League\Fractal\Serializer\JsonApiSerializer as FractalJsonApiSerializer;
 
 class FractalTransformer implements TransformerContract
 {
+    /**
+     * @var Fractal
+     */
     protected $fractal;
 
+    /**
+     * @var string
+     */
     protected $includeKey;
 
+    /**
+     * @var string
+     */
     protected $includeSeperator;
 
+    /**
+     * @var bool
+     */
     protected $eager = true;
 
+    /**
+     * @param Fractal $fractal
+     * @param string $includeKey
+     * @param string $includeSeperator
+     * @param bool $eager
+     */
     public function __construct(Fractal $fractal, $includeKey = 'include', $includeSeperator = ',', $eager = true)
     {
        $this->fractal = $fractal;
@@ -31,6 +50,13 @@ class FractalTransformer implements TransformerContract
 
     }
 
+    /**
+     * @param $response
+     * @param $transformer
+     * @param array $params
+     * @param Closure $after
+     * @return array
+     */
     public function transform($response, $transformer, $params = [], Closure $after = null)
     {
         $resource = $this->createResource($response, $transformer, $params);
@@ -48,11 +74,21 @@ class FractalTransformer implements TransformerContract
         return $this->fractal->createData($resource)->toArray();
     }
 
+    /**
+     * @param IlluminatePaginator $paginator
+     * @return IlluminatePaginatorAdapter
+     */
     protected function createPaginatorAdapter(IlluminatePaginator $paginator)
     {
         return new IlluminatePaginatorAdapter($paginator);
     }
 
+    /**
+     * @param $response
+     * @param $transformer
+     * @param array $parameters
+     * @return FractalCollection|FractalItem
+     */
     protected function createResource($response, $transformer, array $parameters)
     {
         $key = isset($parameters['key']) ? $parameters['key'] : null;
@@ -64,6 +100,11 @@ class FractalTransformer implements TransformerContract
         return new FractalItem($response, $transformer, $key);
     }
 
+    /**
+     * @param $transformer
+     * @param $requestedIncludes
+     * @return array
+     */
     protected function mergeEagerLoads($transformer, $requestedIncludes)
     {
         $availableIncludes = array_intersect($transformer->getAvailableIncludes(), (array) $requestedIncludes);

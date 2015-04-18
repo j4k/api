@@ -4,8 +4,6 @@ namespace j4k\Api\Test;
 
 class ExampleTest extends \PHPUnit_Framework_TestCase
 {
-
-
     /**
      * Test that true does in fact equal true
      */
@@ -13,4 +11,5 @@ class ExampleTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertTrue(true);
     }
+
 }
