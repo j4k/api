@@ -116,4 +116,40 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('{"status_code":204,"message":"No Content"}', $noContentResponse->getContent());
         $this->assertEquals('{"status_code":204,"message":"The resource was successfully updated."}', $noContentResponseWithMessage->getContent());
     }
+
+    public function testErrorConflict()
+    {
+        $errorConflictResponse = $this->factory->errorConflict()->build();
+        $errorConflictResponseWithMessage = $this->factory->errorConflict('There was a conflict updating the resource.')->build();
+
+        $this->assertEquals(409, $errorConflictResponse->getStatusCode());
+        $this->assertEquals(409, $errorConflictResponseWithMessage->getStatusCode());
+
+        $this->assertEquals('{"status_code":409,"message":"Entity Conflict"}', $errorConflictResponse->getContent());
+        $this->assertEquals('{"status_code":409,"message":"There was a conflict updating the resource."}', $errorConflictResponseWithMessage->getContent());
+    }
+
+    public function testErrorInternalConflict()
+    {
+        $errorInternalResponse = $this->factory->errorInternal()->build();
+        $errorInternalResponseWithMessage = $this->factory->errorInternal('You blew the server up.')->build();
+
+        $this->assertEquals(500, $errorInternalResponse->getStatusCode());
+        $this->assertEquals(500, $errorInternalResponseWithMessage->getStatusCode());
+
+        $this->assertEquals('{"status_code":500,"message":"Internal Server Error"}', $errorInternalResponse->getContent());
+        $this->assertEquals('{"status_code":500,"message":"You blew the server up."}', $errorInternalResponseWithMessage->getContent());
+    }
+
+    public function testErrorUnauthorized()
+    {
+        $errorUnauthorizedResponse = $this->factory->errorUnauthorized()->build();
+        $errorUnauthorizedResponseWithMessage = $this->factory->errorUnauthorized('You are not permitted to access this resource.')->build();
+
+        $this->assertEquals(401, $errorUnauthorizedResponse->getStatusCode());
+        $this->assertEquals(401, $errorUnauthorizedResponseWithMessage->getStatusCode());
+
+        $this->assertEquals('{"status_code":401,"message":"Unauthorized Request"}', $errorUnauthorizedResponse->getContent());
+        $this->assertEquals('{"status_code":401,"message":"You are not permitted to access this resource."}', $errorUnauthorizedResponseWithMessage->getContent());
+    }
 }
