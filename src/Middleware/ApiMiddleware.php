@@ -27,6 +27,20 @@ class ApiMiddlewareClass
     protected $format;
 
     /**
+     * Accept Headers accepted
+     */
+    protected $acceptedContentTypes = [
+        'application/vnd.api+json',
+        'application/json'
+    ];
+
+    /**
+     * Array of Supported JSON API Extensions
+     * @var array
+     */
+    protected $supportedExtensions = [];
+
+    /**
      * Handle a request
      *
      * @param string $phrase Phrase to return
@@ -57,6 +71,23 @@ class ApiMiddlewareClass
     public function parseAcceptHeader(Request $request)
     {
         return ['1.0' , 'json'];
+        Request::format();
+//        /**
+//         * Gets a list of content types acceptable by the client browser.
+//         *
+//         * @return array List of content types in preferable order
+//         *
+//         * @api
+//         */
+//        public function getAcceptableContentTypes()
+//    {
+//        if (null !== $this->acceptableContentTypes) {
+//            return $this->acceptableContentTypes;
+//        }
+//
+//        return $this->acceptableContentTypes = array_keys(AcceptHeader::fromString($this->headers->get('Accept'))->all());
+//    }
+
     }
 
 }

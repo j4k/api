@@ -1,5 +1,7 @@
 <?php
 
+namespace j4k\Api\Test\Http;
+
 use Mockery as m;
 use Illuminate\Cookie\CookieJar as Cookie;
 use j4k\Api\Http\ResponseBuilder;

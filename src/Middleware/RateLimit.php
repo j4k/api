@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Container\Container;
 use Illuminate\Cache\CacheManager;
 use j4k\Api\Middleware\RateLimit\Throttle;
+use j4k\Api\Http\ResponseFactory;
 
 class RateLimit
 {
@@ -31,6 +32,7 @@ class RateLimit
         $this->cache = $cache;
         $this->container = $container;
     }
+
     /**
      * Handle a request
      *
@@ -42,21 +44,21 @@ class RateLimit
         $this->request = $request;
         // depending on the route configuration
         $routeparams = $request->route()->getAction();
-        if( isset($routeparams['throttle']) && null !== $routeparams['throttle']){
+        if (isset($routeparams['throttle']) && null !== $routeparams['throttle']) {
             $this->config = array_merge($this->config, $request->route()->getAction()['throttle']);
         }
         // if there is a limit - create a new throttle to be used against the key
-        if($this->limit > 0  || $this->expires > 0){
+        if ($this->limit > 0 || $this->expires > 0) {
             $this->throttle = new Throttle(['limit' => $this->limit, 'expires' => $this->expires]);
             $this->cacheKey = md5($request->path());
             $requestCount = $this->retrieve('requests');
             $expires = $this->retrieve('reset');
 
-            if($expires < time()){
+            if ($expires < time()) {
                 $requestCount = 0;
             }
 
-            if($requestCount > $this->limit){
+            if ($requestCount > $this->limit) {
                 // TODO return 429 status code
                 echo 'There were too many requests from this URL in our specified time period.';
                 exit;
@@ -64,7 +66,7 @@ class RateLimit
         }
 
         // if this isn't a throttled route then return the next closure
-        if ($this->requestWasNotRateLimited()) return $next( $request );
+        if ($this->requestWasNotRateLimited()) return $next($request);
 
         $this->prepareCache();
 
@@ -75,7 +77,7 @@ class RateLimit
 
         $this->increment('requests');
 
-        return $next( $request );
+        return $next($request);
     }
 
     protected function prepareCache()
@@ -94,7 +96,7 @@ class RateLimit
 
     public function getRateLimiter()
     {
-        return $this->request->getClientIp().$this->request->headers->get('user-agent');
+        return $this->request->getClientIp() . $this->request->headers->get('user-agent');
     }
 
     public function requestWasNotRateLimited()
@@ -124,7 +126,7 @@ class RateLimit
 
     public function __get($val)
     {
-        if(array_key_exists($val, $this->config)){
+        if (array_key_exists($val, $this->config)) {
             return $this->config[$val];
         }
         return null;
