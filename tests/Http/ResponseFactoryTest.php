@@ -42,4 +42,14 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->withCollection(new Collection([new \stdClass]), $this->transformer);
     }
 
+    public function testCreateItemRegistersUnderlyingClassWithTransformer()
+    {
+        $this->transformer->shouldReceive('transform')->twice();
+
+        $this->factory->item(new \stdClass, $this->transformer);
+        $this->factory->withItem(new \stdClass, $this->transformer);
+    }
+
+
+
 }
