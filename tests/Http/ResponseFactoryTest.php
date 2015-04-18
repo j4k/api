@@ -50,6 +50,16 @@ class ResponseFactoryTest extends \PHPUnit_Framework_TestCase
         $this->factory->withItem(new \stdClass, $this->transformer);
     }
 
+    public function testPaginatorRegistersUnderlyingClassWithTransformer()
+    {
+        $paginator = m::mock('Illuminate\Contracts\Pagination\LengthAwarePaginator');
+
+        $this->transformer->shouldReceive('transform')->twice();
+
+        $this->factory->paginator($paginator, $this->transformer);
+        $this->factory->withPaginator($paginator, $this->transformer);
+    }
+
 
 
 }
