@@ -50,19 +50,16 @@ class ApiMiddleware
 
     /**
      * Handle a request
-     *
      * @return string Returns the phrase passed in
      */
     public function handle($request, Closure $next)
     {
         try {
-
             list($format, $version) = $this->parseAcceptHeader($request);
             $this->version = $version;
             $this->currentFormat = $format;
 
             $this->parseRequestedExtensions();
-
         } catch (InvalidHeaderException $e) {
             return $this->factory->errorNotSupported('Unsupported Media Type.')->build();
         } catch (InvalidMediaExtensionRequest $e) {

@@ -7,9 +7,16 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/j4k/api.svg?style=flat-square)](https://scrutinizer-ci.com/g/j4k/api)
 [![Total Downloads](https://img.shields.io/packagist/dt/j4k/api.svg?style=flat-square)](https://packagist.org/packages/j4k/api)
 
+This is a helper toolkit for laravel5 that takes a bit of the legwork out of creating json-api compliant api's. It features a host of middleware and response utilities that can be used together or singularly when building out an API to the jsonapi.org specification.
 
-This is where your description should go. Try and limit it to a paragraph or two, and maybe throw in a mention of what
-PSRs you support to avoid any confusion with users and contributors.
+## Todo
+
+- Config Publish
+- Proper JSON Construction
+- URL Generation
+- User Auth with oAuth and WebTokens
+- Auth Validation Middleware
+- Doc Generation
 
 ## Install
 
