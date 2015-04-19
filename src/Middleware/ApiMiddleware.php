@@ -13,8 +13,9 @@ use j4k\Api\Http\ResponseFactory;
 
 class ApiMiddleware
 {
+
     /**
-     * @param Container
+     * Container instance
      */
     protected $container;
 
@@ -43,8 +44,9 @@ class ApiMiddleware
     /**
      * @param ResponseFactory $factory
      */
-    public function __construct(ResponseFactory $response)
+    public function __construct(Container $container, ResponseFactory $response)
     {
+        $this->container = $container;
         $this->factory = $response;
     }
 
@@ -60,9 +62,9 @@ class ApiMiddleware
             $this->currentFormat = $format;
 
             $this->parseRequestedExtensions();
-        } catch (InvalidHeaderException $e) {
+        } catch ( InvalidHeaderException $e) {
             return $this->factory->errorNotSupported('Unsupported Media Type.')->build();
-        } catch (InvalidMediaExtensionRequest $e) {
+        } catch ( InvalidMediaExtensionRequest $e) {
             return $this->factory->errorNotAcceptable()->build();
         }
 
@@ -87,7 +89,7 @@ class ApiMiddleware
             throw new InvalidHeaderException();
         }
         // TODO : Config
-        return ['json', 'v1.0'];
+        return ['v1.0', 'json'];
     }
 
     public function parseRequestedExtensions()
@@ -97,8 +99,7 @@ class ApiMiddleware
 
     private function isStrict()
     {
-        // todo : config
-        return false;
+        return $this->container['config']['api.strict'];
     }
 
 }
