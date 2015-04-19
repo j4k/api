@@ -161,6 +161,16 @@ class ResponseFactory
         return $this->error($message, 401);
     }
 
+    public function errorNotAcceptable($message = 'Not acceptable')
+    {
+        return $this->error($message, 406);
+    }
+
+    public function errorNotSupported($message = 'Unsupported media type')
+    {
+        return $this->error($message, 415);
+    }
+
     /**
      * @param $method
      * @param $parameters

@@ -25,6 +25,7 @@ class ApiServiceProvider extends ServiceProvider
         $this->overloadControllerDispatcher();
         $this->registerTransformer();
         $this->registerResponseFactory();
+        $this->setUpBinds();
     }
 
     protected function overloadControllerDispatcher()
@@ -55,6 +56,17 @@ class ApiServiceProvider extends ServiceProvider
     {
         $this->app->singleton('api.response', function ($app) {
             return new ResponseFactory($app['api.transformer']);
+        });
+    }
+
+    /**
+     *
+     */
+    protected function setUpBinds()
+    {
+        $this->app->bind('j4k\Api\Http\ResponseFactory', function($app)
+        {
+            return $app['api.response'];
         });
     }
 
