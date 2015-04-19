@@ -19,8 +19,8 @@ class ApiServiceProvider extends ServiceProvider
     {
         // Set up API Configuration file
         $this->publishes([
-            __DIR__.'../Config/config.php' => base_path('config/api.php'),
-        ]);
+            __DIR__.'../Config/config.php' => config_path('api.php'),
+        ], 'config');
     }
 
     public function register()

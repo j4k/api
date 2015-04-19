@@ -47,7 +47,6 @@ class FractalTransformer implements TransformerContract
        $this->includeKey = $includeKey;
        $this->includeSeperator = $includeSeperator;
        $this->eager = $eager;
-
     }
 
     /**
